@@ -9,9 +9,11 @@ USER root
 # install required packages
 # - build-essential: provide make and gcc which will be used in "npm install"
 # - sshpass: allow ssh to other servers
+# - gnome-keyring: required by keytar
 # - libsecret-1-dev: required by npm install rebuild keytar
 RUN apt-get update \
-    && apt-get install -y curl build-essential sshpass libsecret-1-dev
+    && apt-get install -y curl build-essential sshpass \
+      gnome-keyring libsecret-1-dev
 
 # switch to jenkins user
 USER jenkins
