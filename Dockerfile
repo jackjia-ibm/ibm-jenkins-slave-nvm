@@ -45,23 +45,19 @@ RUN cat /tmp/pam.config >> /etc/pam.d/sshd
 RUN cat /tmp/pam.config >> /etc/pam.d/login
 RUN rm /tmp/pam.config
 
-# Add to the .bashrc configuration with additional options for auto launching a dbus-session
-COPY .bashrc /tmp/.bashrc
-RUN cat /tmp/.bashrc >> /home/jenkins/.bashrc
-RUN rm /tmp/.bashrc
+COPY .bashrc_all /tmp/.bashrc_all
+COPY .bashrc_ni /home/jenkins/.bashrc_ni
+# prepend to ~/.bashrc
+RUN sed -i -e "/# If not running interactively, don't do anything/r /tmp/.bashrc_all" -e //N /home/jenkins/.bashrc
 
 # switch to jenkins user
 USER jenkins
 
 # install nvm
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh | bash
-RUN cat /home/jenkins/.bashrc
 ENV NVM_DIR /home/jenkins/.nvm
 # install node version and set it as the default one
 RUN /bin/bash -c "source ${NVM_DIR}/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default"
-
-ENV NODE_PATH $NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
-ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 VOLUME "${JENKINS_AGENT_HOME}" "/tmp" "/run" "/var/run"
 WORKDIR "${JENKINS_AGENT_HOME}"
