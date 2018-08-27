@@ -48,6 +48,9 @@ if [[ $# -gt 0 ]]; then
   fi
 fi
 
+# launch nvm environment
+export NVM_DIR=/home/jenkins/.nvm
+source ${NVM_DIR}/nvm.sh
 
 # ensure variables passed to docker container are also exposed to ssh sessions
 env | grep _ >> /etc/environment

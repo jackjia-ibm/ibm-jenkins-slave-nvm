@@ -19,10 +19,11 @@ RUN groupadd -g ${gid} ${group} \
 # - sshpass: allow ssh to other servers
 # - gnome-keyring: required by keytar
 # - libsecret-1-dev: required by npm install rebuild keytar
+# - dbus-x11: includes dbus-launch
 RUN apt-get update && apt-get install --no-install-recommends -y \
     openssh-server \
-    curl build-essential sshpass \
-    gnome-keyring libsecret-1-dev \
+    vim curl build-essential sshpass \
+    gnome-keyring libsecret-1-dev dbus dbus-user-session dbus-x11 \
    && rm -rf /var/lib/apt/lists/*
 
 # setup SSH server
@@ -34,6 +35,7 @@ RUN sed -i /etc/ssh/sshd_config \
         -e 's/#LogLevel.*/LogLevel INFO/' && \
     mkdir /var/run/sshd
 COPY setup-sshd /usr/local/bin/setup-sshd
+RUN chmod +x /usr/local/bin/setup-sshd
 
 # Copy the PAM configuration options to allow auto unlocking of the gnome keyring
 COPY pam.config /tmp/pam.config
@@ -64,6 +66,9 @@ ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 VOLUME "${JENKINS_AGENT_HOME}" "/tmp" "/run" "/var/run"
 WORKDIR "${JENKINS_AGENT_HOME}"
 
+# switch to root user
+USER root
+
 EXPOSE 22
 
-ENTRYPOINT ["setup-sshd"]
+ENTRYPOINT ["/usr/local/bin/setup-sshd"]
