@@ -7,6 +7,7 @@ A jenkins slave image supports:
 - ssh-slave
 - [Node Version Manager](https://github.com/creationix/nvm)
 - node.js v8.11.4 installed by nvm
+- [JFrog CLI](https://jfrog.com/getcli/)
 - Firefox v61.0.2 for headless Selenium test
 - gnome-keyring and keytar
 
