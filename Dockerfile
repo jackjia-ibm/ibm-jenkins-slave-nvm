@@ -34,7 +34,7 @@ RUN groupadd -g ${gid} ${group} \
 # - libdbus-glib-1-2: used by firefox
 RUN apt-get update && apt-get install --no-install-recommends -y \
     openssh-server \
-    vim curl wget build-essential sshpass bzip2 locales \
+    vim curl wget rsync build-essential sshpass bzip2 locales \
     gnome-keyring libsecret-1-dev dbus dbus-user-session dbus-x11 \
     libdbus-glib-1-2 \
    && rm -rf /var/lib/apt/lists/*
