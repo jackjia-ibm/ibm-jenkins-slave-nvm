@@ -36,7 +36,7 @@ RUN groupadd -g ${gid} ${group} \
 # - cpanminus libssl-dev: used by w3c link checker
 RUN apt-get update && apt-get install --no-install-recommends -y \
     openssh-server \
-    vim curl wget rsync pax build-essential sshpass bzip2 locales \
+    vim curl wget rsync pax build-essential sshpass bzip2 jq locales \
     cpanminus libssl-dev \
     gnome-keyring libsecret-1-dev dbus dbus-user-session dbus-x11 \
     libdbus-glib-1-2 \

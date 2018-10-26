@@ -19,6 +19,7 @@ A jenkins slave image supports:
   * rsync
   * vim
   * sshpass
+  * jq
 
 Currently published to [Docker hub: jackjiaibm/ibm-jenkins-slave-nvm](https://hub.docker.com/r/jackjiaibm/ibm-jenkins-slave-nvm/).
 
