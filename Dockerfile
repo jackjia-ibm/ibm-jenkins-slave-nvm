@@ -60,7 +60,7 @@ ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/KEY KEY
 ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/SHA512SUMS SHA512SUMS
 ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/SHA512SUMS.asc SHA512SUMS.asc
 RUN gpg --import KEY \
-    && gpg --verify SHA512SUMS.asc \
+    && gpg --no-tty --verify SHA512SUMS.asc \
     && rm KEY \
     && rm SHA512SUMS.asc
 # need RUN rather than ADD or COPY because both ADD and COPY are silently unzipping the archive
