@@ -59,7 +59,7 @@ RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
 ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/KEY KEY
 ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/SHA512SUMS SHA512SUMS
 ADD https://archive.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/SHA512SUMS.asc SHA512SUMS.asc
-RUN gpg --import KEY \
+RUN gpg --no-tty --import KEY \
     && gpg --no-tty --verify SHA512SUMS.asc \
     && rm KEY \
     && rm SHA512SUMS.asc
