@@ -1,4 +1,5 @@
 FROM openjdk:8-jdk
+LABEL MAINTAINER="Jack T. Jia <jack-tiefeng.jia@ibm.com>"
 
 #####################################################
 # arguments
@@ -18,6 +19,10 @@ ENV JENKINS_AGENT_HOME ${JENKINS_AGENT_HOME}
 ENV NODE_VERSION ${NODE_VERSION}
 ENV NVM_VERSION 0.33.11
 ENV CHECKLINK_VERSION 4_81
+ENV DOCKER_VERSION 18.09.0
+ENV DOCKER_CHANNEL stable
+ENV DOCKER_ARCH x86_64
+ENV DIND_COMMIT 52379fa76dee07ca038624d639d9e14f4fb719ff
 
 #####################################################
 # create jenkins user
@@ -34,12 +39,14 @@ RUN groupadd -g ${gid} ${group} \
 # - dbus-x11: includes dbus-launch
 # - libdbus-glib-1-2: used by firefox
 # - cpanminus libssl-dev: used by w3c link checker
+# - iptables: required by docker
 RUN apt-get update && apt-get install --no-install-recommends -y \
     openssh-server \
     vim curl wget rsync pax build-essential sshpass bzip2 jq locales \
     cpanminus libssl-dev \
     gnome-keyring libsecret-1-dev dbus dbus-user-session dbus-x11 \
     libdbus-glib-1-2 \
+    iptables \
    && rm -rf /var/lib/apt/lists/*
 
 #####################################################
@@ -73,8 +80,6 @@ RUN sed -i /etc/ssh/sshd_config \
         -e 's/#SyslogFacility.*/SyslogFacility AUTH/' \
         -e 's/#LogLevel.*/LogLevel INFO/' && \
     mkdir /var/run/sshd
-COPY setup-sshd /usr/local/bin/setup-sshd
-RUN chmod +x /usr/local/bin/setup-sshd
 
 #####################################################
 # Copy the PAM configuration options to allow auto unlocking of the gnome keyring
@@ -105,6 +110,29 @@ RUN set -x \
   && rm -rf /tmp/link-checker-checklink-${CHECKLINK_VERSION}
 
 #####################################################
+# install docker
+RUN set -eux; \
+  groupadd docker; \
+  useradd -g docker docker; \
+  usermod -aG docker ${user}; \
+  if ! wget -O docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${DOCKER_ARCH}/docker-${DOCKER_VERSION}.tgz"; then \
+    echo >&2 "error: failed to download 'docker-${DOCKER_VERSION}' from '${DOCKER_CHANNEL}' for '${DOCKER_ARCH}'"; \
+    exit 1; \
+  fi; \
+  \
+  tar --extract \
+    --file docker.tgz \
+    --strip-components 1 \
+    --directory /usr/local/bin/ \
+  ; \
+  rm docker.tgz; \
+  \
+  dockerd --version; \
+  docker --version; \
+  wget -O /usr/local/bin/dind "https://raw.githubusercontent.com/docker/docker/${DIND_COMMIT}/hack/dind"; \
+  chmod +x /usr/local/bin/dind
+
+#####################################################
 # install nvm on jenkins user
 # switch to jenkins user
 USER jenkins
@@ -121,4 +149,6 @@ USER root
 #####################################################
 # expose and entrypoint
 EXPOSE 22
-ENTRYPOINT ["/usr/local/bin/setup-sshd"]
+COPY setup-entrypoint /usr/local/bin/setup-entrypoint
+RUN chmod +x /usr/local/bin/setup-entrypoint
+ENTRYPOINT ["/usr/local/bin/setup-entrypoint"]

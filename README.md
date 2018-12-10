@@ -4,7 +4,9 @@
 
 A jenkins slave image supports:
 
-- ssh-slave
+- [Docker in Docker](https://hub.docker.com/_/docker/)
+- OpenJDK 8
+- SSH Slave
 - [Node Version Manager](https://github.com/creationix/nvm)
 - node.js v8.11.4 installed by nvm
 - [JFrog CLI](https://jfrog.com/getcli/)
@@ -22,6 +24,28 @@ A jenkins slave image supports:
   * jq
 
 Currently published to [Docker hub: jackjiaibm/ibm-jenkins-slave-nvm](https://hub.docker.com/r/jackjiaibm/ibm-jenkins-slave-nvm/).
+
+## Build And Test Image
+
+To build image, run command `docker build -t jackjiaibm/ibm-jenkins-slave-nvm .`.
+
+To test run image, run command:
+
+```
+$ docker run --privileged jackjiaibm/ibm-jenkins-slave-nvm <public key>
+
+# or
+
+$ docker run -e --privileged "JENKINS_SLAVE_SSH_PUBKEY=<public key>" jackjiaibm/ibm-jenkins-slave-nvm
+```
+
+For example, use your local SSH public key:
+
+```
+$ docker run --privileged jackjiaibm/ibm-jenkins-slave-nvm "$(cat ~/.ssh/id_rsa.pub)"
+```
+
+After the Jenkins client container is started, you can use `docker ps` find the container and user `docker exec -it -u jenkins <container-id> bash` to connect to the container.
 
 ## About Base Image
 
