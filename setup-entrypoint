@@ -52,10 +52,12 @@ fi
 # ensure variables passed to docker container are also exposed to ssh sessions
 env | grep _ >> /etc/environment
 
+# start SSHd
+ssh-keygen -A
+set -- /usr/sbin/sshd -D -e "${@}"
+"${@}" &
+
 # start docker
 exec "$(which dind)" dockerd \
       --host=unix:///var/run/docker.sock \
-      --host=tcp://0.0.0.0:2375 &
-
-ssh-keygen -A
-exec /usr/sbin/sshd -D -e "${@}"
+      --host=tcp://0.0.0.0:2375
