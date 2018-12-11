@@ -32,17 +32,17 @@ To build image, run command `docker build -t jackjiaibm/ibm-jenkins-slave-nvm .`
 To test run image, run command:
 
 ```
-$ docker run --privileged jackjiaibm/ibm-jenkins-slave-nvm <public key>
+$ docker run --rm -it --privileged jackjiaibm/ibm-jenkins-slave-nvm <public key>
 
 # or
 
-$ docker run -e --privileged "JENKINS_SLAVE_SSH_PUBKEY=<public key>" jackjiaibm/ibm-jenkins-slave-nvm
+$ docker run --rm -it --privileged -e "JENKINS_SLAVE_SSH_PUBKEY=<public key>" jackjiaibm/ibm-jenkins-slave-nvm
 ```
 
 For example, use your local SSH public key:
 
 ```
-$ docker run --privileged jackjiaibm/ibm-jenkins-slave-nvm "$(cat ~/.ssh/id_rsa.pub)"
+$ docker run --rm -it --privileged jackjiaibm/ibm-jenkins-slave-nvm "$(cat ~/.ssh/id_rsa.pub)"
 ```
 
 After the Jenkins client container is started, you can use `docker ps` find the container and user `docker exec -it -u jenkins <container-id> bash` to connect to the container.
