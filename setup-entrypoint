@@ -36,6 +36,12 @@ write_key() {
 	chmod 0700 -R "${JENKINS_AGENT_HOME}/.ssh"
 }
 
+# start docker
+exec "$(which dind)" dockerd \
+      --host=unix:///var/run/docker.sock \
+      --host=tcp://0.0.0.0:2375 &
+
+
 if [[ $JENKINS_SLAVE_SSH_PUBKEY == ssh-* ]]; then
   write_key "${JENKINS_SLAVE_SSH_PUBKEY}"
 fi
@@ -48,16 +54,9 @@ if [[ $# -gt 0 ]]; then
   fi
 fi
 
-
 # ensure variables passed to docker container are also exposed to ssh sessions
 env | grep _ >> /etc/environment
 
 # start SSHd
 ssh-keygen -A
-set -- /usr/sbin/sshd -D -e "${@}"
-"${@}" &
-
-# start docker
-exec "$(which dind)" dockerd \
-      --host=unix:///var/run/docker.sock \
-      --host=tcp://0.0.0.0:2375
+exec /usr/sbin/sshd -D -e "${@}"
