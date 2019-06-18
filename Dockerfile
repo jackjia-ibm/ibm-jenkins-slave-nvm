@@ -7,6 +7,7 @@ ARG user=jenkins
 ARG group=jenkins
 ARG uid=1000
 ARG gid=1000
+ARG docker_gid=999
 ARG JENKINS_AGENT_HOME=/home/${user}
 ARG NODE_VERSION=8.11.4
 ARG FIREFOX_VERSION=61.0.2
@@ -112,7 +113,7 @@ RUN set -x \
 #####################################################
 # install docker
 RUN set -eux; \
-  groupadd docker; \
+  groupadd -g ${docker_gid} docker; \
   useradd -g docker docker; \
   usermod -aG docker ${user}; \
   if ! wget -O docker.tgz "https://download.docker.com/linux/static/${DOCKER_CHANNEL}/${DOCKER_ARCH}/docker-${DOCKER_VERSION}.tgz"; then \
@@ -139,7 +140,7 @@ USER jenkins
 RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v${NVM_VERSION}/install.sh | bash
 ENV NVM_DIR /home/jenkins/.nvm
 # install node version and set it as the default one
-RUN /bin/bash -c "source ${NVM_DIR}/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default && npm install -g yarn && npm install -g jfrog-cli-go"
+RUN /bin/bash -c "source ${NVM_DIR}/nvm.sh && nvm install $NODE_VERSION && nvm alias default $NODE_VERSION && nvm use default && npm install -g npm && npm install -g yarn && npm install -g jfrog-cli-go"
 # define volume
 VOLUME "${JENKINS_AGENT_HOME}" "/tmp" "/run" "/var/run"
 WORKDIR "${JENKINS_AGENT_HOME}"
